@@ -1,0 +1,43 @@
+name: Test My Go Action
+
+permissions:
+  id-token: write
+  contents: read
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - master
+jobs:
+  run-go-action:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+      
+      - name: Run CloudBees platform workflow
+        uses: cloudbees-io-gha/run-cloudbees-workflow@v1
+        id: run-workflow
+        with:
+          cloudbees-url:  "https://api.saas-preprod.beescloud.com/"
+          workflow-file-name: "my-workflow.yaml"
+          cloudbees-pat: "cb_api_Tzy2LcLaUEwBE442IXXX1VCzduZct0Vx5jPc9ffv5VQI/F0lCFuhRf2yTLLXh1W3o91vvLi6kpnQrkouCmQC7A=="
+          
+    
+      - name: Publish evidence
+        uses: cloudbees-io-gha/publish-evidence-item@v2
+        with:
+          cloudbees-url:  "https://api.saas-preprod.beescloud.com/"
+          content: |-
+            # Sample Markdown evidence output
+            - Application endpoint: https://app.example.com/qa
+            - Artifacts
+              - [backend.jar](https://example.com/repo/app/v1.0/backend.jar)
+              
+      - name: Use runUrl output
+        run: echo "The CloudBees run URL is ${{ steps.go-action.outputs.cbp_run_url}}"
+        
+
+
+    
